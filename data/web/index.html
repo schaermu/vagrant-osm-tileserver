@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>zskarte-server</title>
+    <link rel="stylesheet" href="//unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
+    <style>
+    #mapContainer { height: 600px; }
+    body {margin:0;}
+    </style>
+  </head>
+  <body>
+     <div id="mapContainer"></div>
+  </body>
+  <script src="//unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
+  <script>
+    // set up the map
+  	var map = new L.Map('mapContainer', { preferCanvas: true });
+
+  	var tileUrl = "http://localhost:8080/osm_tiles/{z}/{x}/{y}.png";
+  	var osm = new L.TileLayer(tileUrl, {minZoom: 8, maxZoom: 19});
+
+  	map.setView(new L.LatLng(46.9479740, 7.4474470), 15);
+  	map.addLayer(osm);
+  </script>
+</html>
