@@ -22,10 +22,7 @@ Vagrant.configure("2") do |config|
     apt-get update
 
     # Base packages
-    apt-get install -y make cmake g++ libboost-all-dev libexpat1-dev zlib1g-dev subversion git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev libgeos-dev libgeos++-dev libpq-dev libbz2-dev libproj-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler libfreetype6-dev libpng12-dev libtiff4-dev libicu-dev libgdal1-dev libcairo-dev libcairomm-1.0-dev apache2 apache2-dev libagg-dev liblua5.2-dev ttf-unifont lua5.2 liblua5.2-dev libgeotiff-epsg node-carto
-
-    # PostgreSQL
-    apt-get install -y postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1
+    apt-get install -y make cmake g++ libboost-all-dev libexpat1-dev zlib1g-dev subversion git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev libgeos-dev libgeos++-dev libpq-dev libbz2-dev libproj-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler libfreetype6-dev libpng12-dev libtiff4-dev libicu-dev libgdal1-dev libcairo-dev libcairomm-1.0-dev apache2 apache2-dev libagg-dev liblua5.2-dev ttf-unifont lua5.2 liblua5.2-dev libgeotiff-epsg node-carto postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1
 
     # Setting up PostgreSQL
     sudo -u postgres createuser -S zskarte
@@ -61,11 +58,11 @@ Vagrant.configure("2") do |config|
     mkdir -p /usr/local/share/maps/style
     chown zskarte /usr/local/share/maps/style
     cd /usr/local/share/maps/style
-    wget https://github.com/mapbox/osm-bright/archive/master.zip
-    wget http://data.openstreetmapdata.com/simplified-land-polygons-complete-3857.zip
-    wget http://data.openstreetmapdata.com/land-polygons-split-3857.zip
+    wget -q https://github.com/mapbox/osm-bright/archive/master.zip
+    wget -q http://data.openstreetmapdata.com/simplified-land-polygons-complete-3857.zip
+    wget -q http://data.openstreetmapdata.com/land-polygons-split-3857.zip
     mkdir ne_10m_populated_places_simple && cd ne_10m_populated_places_simple
-    wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_populated_places_simple.zip
+    wget -q http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_populated_places_simple.zip
     unzip ne_10m_populated_places_simple.zip && rm ne_10m_populated_places_simple.zip
     cd ..
     unzip '*.zip'
@@ -96,6 +93,8 @@ Vagrant.configure("2") do |config|
     cp /data_share/config/renderd/renderd.init /etc/init.d/renderd
     chmod u+x /etc/init.d/renderd
     ln -s /etc/init.d/renderd /etc/rc2.d/S20renderd
+    mkdir /var/lib/mod_tile
+    chown zskarte /var/lib/mod_tile
 
     # System tuning
     cp /data_share/config/postgres/postgresql.conf /etc/postgresql/9.3/main/
@@ -105,14 +104,13 @@ Vagrant.configure("2") do |config|
     mkdir /usr/local/share/maps/switzerland
     chown zskarte /usr/local/share/maps/switzerland
     cd /usr/local/share/maps/switzerland
-    wget http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
-    sudo -u zskarte osm2pgsql --slim -d gis -C 2048 --number-processes 3 /usr/local/share/maps/switzerland/switzerland-latest.osm.pbf
+    wget -q http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
+    sudo -u zskarte osm2pgsql --slim -d gis -C 3072 --number-processes 3 /usr/local/share/maps/switzerland/switzerland-latest.osm.pbf
 
     # Starting services
     mkdir /var/run/renderd
     chown zskarte /var/run/renderd
-    cp  /root/src/mod_tile/debian/renderd.init /etc/init.d/renderd
-    chmod u+x /etc/init.d/renderd
+    /etc/init.d/renderd start
     service apache2 reload
 
     # Setup default map interface (TODO: replace with zskarte)
