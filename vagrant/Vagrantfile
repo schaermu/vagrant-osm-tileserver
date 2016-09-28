@@ -36,7 +36,8 @@ Vagrant.configure("2") do |config|
     cd ~/src/osm2pgsql
     mkdir build && cd build
     cmake ..
-    make && make install
+    make
+    make install
 
     # Installing Mapnik
     git clone git://github.com/mapnik/mapnik ~/src/mapnik
@@ -44,14 +45,18 @@ Vagrant.configure("2") do |config|
     git branch 2.2 origin/2.2.x
     git checkout 2.2
     python scons/scons.py configure INPUT_PLUGINS=all OPTIMIZATION=3 SYSTEM_FONTS=/usr/share/fonts/truetype/
-    make && make install
+    make
+    make install
     ldconfig
 
     # Installing mod_tile and renderd
     git clone git://github.com/openstreetmap/mod_tile.git ~/src/mod_tile
     cd ~/src/mod_tile
-    ./autogen.sh && ./configure && make
-    make install && make install-mod_tile
+    ./autogen.sh
+    ./configure
+    make
+    make install
+    make install-mod_tile
     ldconfig
 
     # Installing osm-bright stylesheet
@@ -77,7 +82,7 @@ Vagrant.configure("2") do |config|
     shapeindex simplified_land_polygons.shp
     cd ../..
     cp /data_share/config/osm-bright/osm-bright.osm2pgsql.mml osm-bright/
-    cp /data_share/config/osm-bright/labels.mml osm-bright/
+    cp /data_share/config/osm-bright/labels.mss osm-bright/
     cp /data_share/config/osm-bright/configure.py .
     rm configure.py.sample
     ./make.py
@@ -89,7 +94,6 @@ Vagrant.configure("2") do |config|
     echo "LoadModule tile_module /usr/lib/apache2/modules/mod_tile.so" >> /etc/apache2/conf-available/mod_tile.conf
     cp /data_share/config/apache2/000-default.conf /etc/apache2/sites-available/
     a2enconf mod_tile
-    service apache2 reload
     cp /data_share/config/renderd/renderd.init /etc/init.d/renderd
     chmod u+x /etc/init.d/renderd
     ln -s /etc/init.d/renderd /etc/rc2.d/S20renderd
@@ -105,13 +109,13 @@ Vagrant.configure("2") do |config|
     chown zskarte /usr/local/share/maps/switzerland
     cd /usr/local/share/maps/switzerland
     wget -q http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
-    sudo -u zskarte osm2pgsql --slim -d gis -C 3072 --number-processes 3 /usr/local/share/maps/switzerland/switzerland-latest.osm.pbf
+    sudo -u zskarte osm2pgsql --slim -d gis -C 2048 --number-processes 3 /usr/local/share/maps/switzerland/switzerland-latest.osm.pbf
 
     # Starting services
     mkdir /var/run/renderd
     chown zskarte /var/run/renderd
     /etc/init.d/renderd start
-    service apache2 reload
+    service apache2 restart
 
     # Setup default map interface (TODO: replace with zskarte)
     rm /var/www/html/index.html
