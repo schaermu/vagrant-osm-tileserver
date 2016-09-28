@@ -10,7 +10,9 @@ This Vagrant Box's target is to provide a completely standalone, off-the-wire ru
 
 The maps are rendered using [osm-bright](https://github.com/mapbox/osm-bright), GIS data is imported from [Geofabrik](http://download.geofabrik.de/) (using the latest data for [Switzerland](http://download.geofabrik.de/europe/switzerland.html), downloaded on provision). The setup is based on [this article](https://switch2osm.org/serving-tiles/manually-building-a-tile-server-14-04/).
 
-It is HIGHLY advised to setup the box on a fast SSD disk (due to the high I/O throughput required for the GIS-data import). When changing the memory settings for the box, don't forget to adapt the cache-setting for the osm2pgsql call (L112 in `vagrant\Vagrantfile`). It should be half the value of the memory space allocated.
+It is HIGHLY advised to setup the box on a fast SSD disk (due to the high I/O throughput required for the GIS-data import). The disk space required on the server is about 15 GB (depends on the amount of tiles that are rendered).
+
+When changing the memory settings for the box, don't forget to adapt the cache-setting for the osm2pgsql call (L112 in `vagrant\Vagrantfile`). It should be half the value of the memory space allocated.
 
 ## Usage
 1. Make sure you have the latest versions of both [Vagrant](https://www.vagrantup.com/downloads.html) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads) installed.
