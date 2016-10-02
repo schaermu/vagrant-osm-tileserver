@@ -18,11 +18,12 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision "shell", inline: <<-SHELL
-    # Update repository
+    # Update repository, set timezone
     apt-get update
+    timedatectl set-timezone Europe/Zurich
 
     # Base packages
-    apt-get install -y make cmake g++ libboost-all-dev libexpat1-dev zlib1g-dev subversion git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev libgeos-dev libgeos++-dev libpq-dev libbz2-dev libproj-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler libfreetype6-dev libpng12-dev libtiff4-dev libicu-dev libgdal1-dev libcairo-dev libcairomm-1.0-dev apache2 apache2-dev libagg-dev liblua5.2-dev ttf-unifont lua5.2 liblua5.2-dev libgeotiff-epsg node-carto postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1
+    apt-get install -y make cmake g++ libboost-all-dev libexpat1-dev zlib1g-dev subversion git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev libgeos-dev libgeos++-dev libpq-dev libbz2-dev libproj-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler libfreetype6-dev libpng12-dev libtiff4-dev libicu-dev libgdal1-dev libcairo-dev libcairomm-1.0-dev apache2 apache2-dev libagg-dev liblua5.2-dev ttf-unifont lua5.2 liblua5.2-dev libgeotiff-epsg node-carto postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 osmosis
 
     # Setting up PostgreSQL
     sudo -u postgres createuser -S zskarte
@@ -108,8 +109,18 @@ Vagrant.configure("2") do |config|
     mkdir /usr/local/share/maps/switzerland
     chown zskarte /usr/local/share/maps/switzerland
     cd /usr/local/share/maps/switzerland
-    wget -q http://download.geofabrik.de/europe/switzerland-latest.osm.pbf
-    sudo -u zskarte osm2pgsql --slim -d gis -C 2048 --number-processes 3 /usr/local/share/maps/switzerland/switzerland-latest.osm.pbf
+    wget -q http://planet.osm.ch/switzerland-exact.osm.pbf
+    sudo -u zskarte osm2pgsql --slim -d gis -C 2048 --number-processes 3 /usr/local/share/maps/switzerland/switzerland-exact.osm.pbf
+
+    # Setup auto-updating for OSM-data
+    /root/src/osm2pgsql/install-postgis-osm-user.sh gis zskarte
+    cp /root/src/mod_tile/openstreetmap-tiles-update-expire /usr/bin/
+    cp /root/src/mod_tile/osmosis-db_replag /usr/bin/
+    mkdir /var/log/tiles && chown zskarte /var/log/tiles
+    DATE=`date +%Y-%m-%d` &&  sudo -u zskarte openstreetmap-tiles-update-expire $DATE
+    cp /data_share/config/osmosis/configuration.txt /var/lib/mod_tile/.osmosis/
+    sudo -u zskarte openstreetmap-tiles-update-expire
+    cp /data_share/config/osmosis/rc.local /etc/rc.local
 
     # Starting services
     mkdir /var/run/renderd
