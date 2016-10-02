@@ -8,7 +8,7 @@ This Vagrant Box's target is to provide a completely standalone, off-the-wire ru
 * [PostgreSQL 9.3](https://www.postgresql.org/)
 * [osm2pgsql](https://github.com/openstreetmap/osm2pgsql) (compiled from latest master on provision)
 
-The maps are rendered using [osm-bright](https://github.com/mapbox/osm-bright), GIS data is imported from [Geofabrik](http://download.geofabrik.de/) (using the latest data for [Switzerland](http://download.geofabrik.de/europe/switzerland.html), downloaded on provision). The setup is based on [this article](https://switch2osm.org/serving-tiles/manually-building-a-tile-server-14-04/).
+The maps are rendered using [osm-bright](https://github.com/mapbox/osm-bright), GIS data is imported from the [Swiss OpenStreetMap Association](http://www.osm.ch/) (using the latest data for [Switzerland](http://planet.osm.ch/switzerland-exact.osm.pbf), downloaded on provision). The setup is based on [this article](https://switch2osm.org/serving-tiles/manually-building-a-tile-server-14-04/).
 
 It is HIGHLY advised to setup the box on a fast SSD disk (due to the high I/O throughput required for the GIS-data import). The disk space required on the server is about 15 GB (depends on the amount of tiles that are rendered).
 
