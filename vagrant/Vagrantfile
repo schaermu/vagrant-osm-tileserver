@@ -119,7 +119,7 @@ Vagrant.configure("2") do |config|
     DATE=`date +%Y-%m-%d` &&  sudo -u zskarte openstreetmap-tiles-update-expire $DATE
     cp /data_share/config/osmosis/configuration.txt /var/lib/mod_tile/.osmosis/
     sudo -u zskarte openstreetmap-tiles-update-expire
-    echo "sudo -u zskarte openstreetmap-tiles-update-expire" >> /etc/rc.local
+    cp /data_share/config/osmosis/rc.local /etc/rc.local
 
     # Starting services
     mkdir /var/run/renderd
